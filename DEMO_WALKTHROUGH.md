@@ -38,7 +38,7 @@
 ## 💡 Anticipated Jury Q&A (1.5 Minutes)
 
 **Q: How does this prove it is an AI Agent and not just a workflow automation script?**  
-*A:* "A traditional workflow script blindly executes A then B with hardcoded values. In SentinelOps, the LLM reasoning loop (`Groq LLaMA 3.3`) inspects the dynamic meteorological output. If the weather is mild, it takes no emergency action. If conditions exceed safety thresholds (e.g., >40°C heatwave or >80% storm probability), it dynamically formulates customized mitigation strategies, authors specific action items, and routes them to appropriate channels."
+*A:* "A traditional workflow script blindly executes A then B with hardcoded values. In SentinelOps, the LLM reasoning loop (live on Groq) inspects the dynamic meteorological output. If the weather is mild, it takes no emergency action. If conditions exceed safety thresholds (e.g., >40°C heatwave or >80% storm probability), it dynamically formulates customized mitigation strategies, authors specific action items, and routes them to appropriate channels."
 
 **Q: What Swytchcode APIs are used?**  
 *A:* "We integrated 4 Swytchcode APIs: **OpenWeather** (physical observation), **Notion** (protocol authoring), **Slack** (team dispatch), and **Resend** (workforce email advisories). Output from OpenWeather directly dictates the contents and parameters sent to Notion, Slack, and Resend."

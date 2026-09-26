@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/health');
       const data = await res.json();
       if (data.config && data.config.hasGroqKey) {
-        activeModelLabel.textContent = 'Groq LLaMA 3.3 (Live Key)';
+        activeModelLabel.textContent = 'Groq Live LLM (ReAct Loop)';
         activeModelLabel.parentElement.style.borderColor = 'rgba(16, 185, 129, 0.4)';
         activeModelLabel.parentElement.style.color = '#34d399';
       } else {

@@ -9,9 +9,30 @@ class AgentRunner {
   constructor(swytchcodeClient, groqApiKey = '') {
     this.client = swytchcodeClient;
     this.groqApiKey = groqApiKey || process.env.GROQ_API_KEY || '';
+    this.chatModel = null;
     if (this.groqApiKey) {
       this.groq = new Groq({ apiKey: this.groqApiKey });
     }
+  }
+
+  // Pick the best available chat model on the account, with sensible fallbacks.
+  async resolveChatModel() {
+    if (this.chatModel) return this.chatModel;
+    const preferred = [
+      process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+      'openai/gpt-oss-120b',
+      'openai/gpt-oss-20b'
+    ];
+    try {
+      const list = await this.groq.models.list();
+      const available = new Set((list.data || []).map(m => m.id));
+      this.chatModel = preferred.find(m => available.has(m)) || [...available].find(id => !/whisper|guard|orpheus|tts/i.test(id)) || preferred[0];
+    } catch (e) {
+      console.warn(`[AgentRunner] Could not list models (${e.message}); using default.`);
+      this.chatModel = preferred[0];
+    }
+    console.log(`[AgentRunner] Using Groq model: ${this.chatModel}`);
+    return this.chatModel;
   }
 
   async runWorkflow(userPrompt, onStepCallback = () => {}) {
@@ -46,7 +67,7 @@ class AgentRunner {
     // Check if Groq API key is active and usable
     if (this.groqApiKey) {
       try {
-        console.log('[AgentRunner] Initializing Groq LLaMA 3.3 ReAct loop...');
+        console.log('[AgentRunner] Initializing Groq live ReAct loop...');
         const result = await this.runGroqToolLoop(userPrompt, emitStep, artifacts);
         return {
           success: true,
@@ -86,6 +107,7 @@ class AgentRunner {
       { role: 'user', content: userPrompt }
     ];
 
+    const model = await this.resolveChatModel();
     let loopCount = 0;
     const maxLoops = 6;
     let finalSummary = '';
@@ -94,7 +116,7 @@ class AgentRunner {
       loopCount++;
 
       const completion = await this.groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+        model,
         messages,
         tools: toolDefinitions,
         tool_choice: 'auto',

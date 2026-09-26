@@ -13,7 +13,7 @@ Enterprises with distributed workforces, logistics fleets, delivery hubs, and ph
 
 Manual coordination across fragmented enterprise software takes hours—leading to safety hazards, damaged assets, and lost revenue.
 
-**SentinelOps AI** is an autonomous AI agent built for **Track 5 (AI Real World Agent)** that connects real-world environmental observations directly to operational execution. Powered by **Groq LLaMA 3.3 (70B)** and **4 Swytchcode API integrations**, it:
+**SentinelOps AI** is an autonomous AI agent built for **Track 5 (AI Real World Agent)** that connects real-world environmental observations directly to operational execution. Powered by **Groq LLM tool-calling** and **4 Swytchcode API integrations**, it:
 1. **Observes** real-world atmospheric hazards via **Swytchcode OpenWeather API**.
 2. **Evaluates** risk severity (Critical / High / Moderate) using autonomous multi-step reasoning.
 3. **Generates & Publishes** an immutable Incident Protocol and action checklist in **Notion via Swytchcode**.
@@ -28,7 +28,7 @@ Manual coordination across fragmented enterprise software takes hours—leading 
 flowchart TD
     User([User / Operations Manager]) -->|Natural Language Prompt| Agent[SentinelOps AI Agent]
     
-    subgraph Reasoning Loop [Autonomous ReAct Engine / Groq LLaMA 3.3]
+    subgraph Reasoning Loop [Autonomous ReAct Engine / Groq Live LLM]
         Agent -->|1. Parse Request & Formulate Plan| Reason1[Deliberation & Tool Selection]
         Reason1 -->|2. Invoke Tool| SW_Weather[Swytchcode OpenWeather API]
         SW_Weather -->|3. Hazard Telemetry: Rain, Temp, Wind, AQI| Reason2[Risk Evaluation & Severity Index]
@@ -107,12 +107,26 @@ npm start
 
 Open `http://localhost:3001` in your browser.
 
+### 🔑 API Keys (Live Mode)
+
+The agent runs fully offline with realistic sandbox data, but goes **live** when you add keys to `.env`:
+
+| Key | What it unlocks | Get it at |
+|---|---|---|
+| `GROQ_API_KEY` | Real LLM reasoning loop (model auto-detected from your account) | [console.groq.com](https://console.groq.com/keys) |
+| `RESEND_API_KEY` | **Real** advisory emails delivered via Resend | [resend.com/api-keys](https://resend.com/api-keys) |
+| `ALERT_EMAIL_RECIPIENT` | Where live emails are delivered (Resend free tier only delivers to your own account email until you verify a domain) | — |
+| `OPENWEATHER_API_KEY` | Real weather telemetry (with true precipitation probability + AQI) | [openweathermap.org](https://home.openweathermap.org/api_keys) |
+| `NOTION_API_KEY` + `NOTION_DATABASE_ID` | Real incident protocol pages in your Notion workspace | [notion.so/my-integrations](https://www.notion.so/my-integrations) |
+| `SLACK_WEBHOOK_URL` or `SLACK_BOT_TOKEN` | Real Slack dispatch to your workspace | [api.slack.com/apps](https://api.slack.com/apps) |
+| `SWYTCHCODE_API_KEY` | Routes all 4 tools through the Swytchcode gateway | Swytchcode |
+
 ---
 
 ## 🏆 Buildathon Checklist & Deliverables
 
 - [x] **Track Selected**: Track 5 – AI Real World Agent
-- [x] **Agentic Framework**: ReAct Autonomous Loop powered by Groq LLaMA 3.3
+- [x] **Agentic Framework**: ReAct Autonomous Loop powered by Groq (live LLM tool-calling with automatic model detection)
 - [x] **Swytchcode API Integrations**: 4 APIs integrated (OpenWeather, Notion, Slack, Resend)
 - [x] **Dynamic Tool Chaining**: Weather output strictly shapes Notion, Slack, and Resend payloads
 - [x] **Interactive Demo UI**: Live streaming execution graph + multi-tool artifact previews

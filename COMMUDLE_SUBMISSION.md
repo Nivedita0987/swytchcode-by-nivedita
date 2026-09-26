@@ -27,7 +27,7 @@ Distributed enterprises, logistics fleets, delivery operators, and facility team
 SentinelOps is an autonomous AI agent built for Track 5 that continuously reasons over physical world telemetry and orchestrates mitigation actions across enterprise software:
 - Understands natural language requests and business scenarios.
 - Observes physical hazard telemetry in real time via Swytchcode OpenWeather API.
-- Evaluates operational risk severity using an autonomous ReAct loop powered by Groq LLaMA 3.3.
+- Evaluates operational risk severity using an autonomous ReAct loop powered by Groq.
 - Autonomously authors and publishes formal Incident Protocols and action checklists to Notion via Swytchcode.
 - Broadcasts interactive Block Kit incident cards with live weather metrics and direct Notion links to Slack via Swytchcode.
 - Dispatches emergency safety directive emails to distributed workforce personnel via Resend via Swytchcode.
@@ -43,7 +43,7 @@ The agent demonstrates deep tool chaining:
 OpenWeather hazard telemetry & severity calculation directly determines the title, protocol instructions, and action items generated for Notion; the resulting Notion URL and weather metrics are then injected into the Slack Block Kit card, and an emergency advisory is tailored and dispatched via Resend.
 
 ### 5. Tech Stack & Architecture
-- **Agentic Framework**: ReAct Autonomous Loop / Function Calling with Groq LLaMA 3.3 (70B)
+- **Agentic Framework**: ReAct Autonomous Loop / Function Calling with Groq (live LLM, model auto-detected)
 - **API Gateway**: Swytchcode API Client (with resilient live sandbox fallback)
 - **Backend**: Node.js & Express with real-time Server-Sent Events (SSE) stream
 - **Frontend**: High-aesthetic Operations Command Center UI with live execution graph and multi-platform preview center

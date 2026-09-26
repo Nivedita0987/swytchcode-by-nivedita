@@ -54,6 +54,31 @@ class SwytchcodeClient {
         const resp = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(query)}&units=metric&appid=${this.openWeatherKey}`);
         if (resp.ok) {
           const d = await resp.json();
+          let rainProbability = d.weather[0].main.toLowerCase().includes('rain') ? 90 : 25;
+          let aqi = 150;
+
+          // Real precipitation probability from 3-hour forecast (pop field)
+          try {
+            const fResp = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(query)}&units=metric&appid=${this.openWeatherKey}`);
+            if (fResp.ok) {
+              const f = await fResp.json();
+              if (Array.isArray(f.list) && f.list[0] && typeof f.list[0].pop === 'number') {
+                rainProbability = Math.round(f.list[0].pop * 100);
+              }
+            }
+          } catch (e) { /* keep heuristic estimate */ }
+
+          // Real AQI from air pollution endpoint (1-5 scale mapped to index)
+          try {
+            const aResp = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${d.coord.lat}&lon=${d.coord.lon}&appid=${this.openWeatherKey}`);
+            if (aResp.ok) {
+              const a = await aResp.json();
+              if (a.list && a.list[0] && a.list[0].main && a.list[0].main.aqi) {
+                aqi = a.list[0].main.aqi * 50;
+              }
+            }
+          } catch (e) { /* keep default */ }
+
           return {
             source: 'openweather_direct',
             city: d.name,
@@ -64,8 +89,8 @@ class SwytchcodeClient {
             windSpeedKmH: Math.round(d.wind.speed * 3.6),
             weatherCondition: d.weather[0].main,
             description: d.weather[0].description,
-            rainProbability: d.weather[0].main.toLowerCase().includes('rain') ? 90 : 25,
-            aqi: 195,
+            rainProbability,
+            aqi,
             timestamp: new Date().toISOString()
           };
         }
@@ -204,6 +229,73 @@ class SwytchcodeClient {
       }
     }
 
+    // Direct Notion API fallback if user provided direct key + database
+    if (this.notionKey && process.env.NOTION_DATABASE_ID) {
+      try {
+        const response = await fetch('https://api.notion.com/v1/pages', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.notionKey}`,
+            'Notion-Version': '2022-06-28',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            parent: { database_id: process.env.NOTION_DATABASE_ID },
+            properties: {
+              title: {
+                title: [{ text: { content: title } }]
+              }
+            },
+            children: [
+              {
+                object: 'block', type: 'callout',
+                callout: {
+                  icon: { emoji: '⚠️' },
+                  rich_text: [{ type: 'text', text: { content: `${severity} — Activated automatically by SentinelOps Agent` } }]
+                }
+              },
+              {
+                object: 'block', type: 'paragraph',
+                paragraph: { rich_text: [{ type: 'text', text: { content: `Location: ${location || 'N/A'} | Weather Context: ${weatherSummary || 'N/A'}` } }] }
+              },
+              {
+                object: 'block', type: 'heading_2',
+                heading_2: { rich_text: [{ type: 'text', text: { content: 'Operational Contingency Plan' } }] }
+              },
+              {
+                object: 'block', type: 'paragraph',
+                paragraph: { rich_text: [{ type: 'text', text: { content: contingencyPlan || '' } }] }
+              },
+              {
+                object: 'block', type: 'heading_2',
+                heading_2: { rich_text: [{ type: 'text', text: { content: 'Mandatory Action Items' } }] }
+              },
+              ...actionItems.map(item => ({
+                object: 'block', type: 'to_do',
+                to_do: { rich_text: [{ type: 'text', text: { content: item } }], checked: false }
+              }))
+            ]
+          })
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            status: 'success',
+            source: 'notion_direct',
+            pageId: data.id,
+            url: data.url,
+            title,
+            severity,
+            actionItemsCount: actionItems.length,
+            createdAt: new Date().toISOString()
+          };
+        }
+        console.warn(`[Notion Direct] Failed: ${response.status} ${await response.text()}`);
+      } catch (err) {
+        console.warn(`[Notion Direct] Fallback: ${err.message}`);
+      }
+    }
+
     // Direct / Sandbox response
     return {
       status: 'success',
@@ -302,6 +394,64 @@ class SwytchcodeClient {
       }
     }
 
+    // Direct Slack webhook fallback (interactive buttons not supported in webhooks)
+    if (this.slackWebhook) {
+      try {
+        const webhookBlocks = slackBlocks.filter(b => b.type !== 'actions');
+        const response = await fetch(this.slackWebhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: `🚨 [${severity}] ${title} — ${summary || ''}`,
+            blocks: webhookBlocks
+          })
+        });
+        if (response.ok) {
+          return {
+            status: 'delivered',
+            source: 'slack_webhook_direct',
+            channel,
+            messageTs: `${(Date.now() / 1000).toFixed(6)}`,
+            blocksCount: webhookBlocks.length,
+            severity,
+            sentAt: new Date().toISOString()
+          };
+        }
+        console.warn(`[Slack Webhook] Failed: ${response.status}`);
+      } catch (err) {
+        console.warn(`[Slack Webhook] Fallback: ${err.message}`);
+      }
+    }
+
+    // Direct Slack Web API fallback (bot token)
+    if (this.slackToken) {
+      try {
+        const response = await fetch('https://slack.com/api/chat.postMessage', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.slackToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ channel, text: `🚨 [${severity}] ${title}`, blocks: slackBlocks })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.ok) {
+          return {
+            status: 'delivered',
+            source: 'slack_webapi_direct',
+            channel: data.channel || channel,
+            messageTs: data.ts,
+            blocksCount: slackBlocks.length,
+            severity,
+            sentAt: new Date().toISOString()
+          };
+        }
+        console.warn(`[Slack WebAPI] Failed: ${data.error || response.status}`);
+      } catch (err) {
+        console.warn(`[Slack WebAPI] Fallback: ${err.message}`);
+      }
+    }
+
     return {
       status: 'delivered',
       source: 'swytchcode_sandbox',
@@ -321,6 +471,11 @@ class SwytchcodeClient {
   async sendResendAdvisory(payload) {
     const { to = 'field-team@enterprise.com', subject, severity = 'HIGH', location = 'Gurgaon', headline, instructions = [], emergencyPhone = '+91-11-2345-6789' } = payload;
     console.log(`[Swytchcode Resend] Sending Safety Advisory to ${to}: "${subject}"`);
+
+    // Resend free tier only delivers to your own account email until a domain is
+    // verified - allow a fixed verified recipient via ALERT_EMAIL_RECIPIENT.
+    const recipient = process.env.ALERT_EMAIL_RECIPIENT || (Array.isArray(to) ? to[0] : to) || 'field-team@enterprise.com';
+    const recipients = [recipient];
 
     const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; border-radius: 12px; overflow: hidden; border: 1px solid #334155;">
@@ -375,11 +530,45 @@ class SwytchcodeClient {
       }
     }
 
+    // Direct Resend API fallback (onboarding@resend.dev works without a verified domain)
+    if (this.resendKey) {
+      try {
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.resendKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'SentinelOps Emergency <onboarding@resend.dev>',
+            to: recipients,
+            subject,
+            html: emailHtml
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.ok) {
+          return {
+            status: 'sent',
+            source: 'resend_direct',
+            emailId: data.id || `resend_${Date.now()}`,
+            recipients,
+            subject,
+            severity,
+            dispatchedAt: new Date().toISOString()
+          };
+        }
+        console.warn(`[Resend Direct] Failed: ${response.status} ${JSON.stringify(data)}`);
+      } catch (err) {
+        console.warn(`[Resend Direct] Fallback: ${err.message}`);
+      }
+    }
+
     return {
       status: 'sent',
       source: 'swytchcode_sandbox',
       emailId: `swytch_mail_${Date.now().toString(36)}`,
-      recipients: Array.isArray(to) ? to : [to],
+      recipients,
       subject,
       severity,
       htmlPreview: emailHtml,
