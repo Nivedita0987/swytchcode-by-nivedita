@@ -1,0 +1,30 @@
+{
+  "name": "sentinelops-ai",
+  "version": "1.0.0",
+  "description": "Autonomous Real-World Weather & Operations Incident Commander for Track 5 (Build with Swytchcode)",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "keywords": [
+    "swytchcode",
+    "ai-agent",
+    "track-5",
+    "real-world-agent",
+    "openweather",
+    "notion",
+    "slack",
+    "resend",
+    "groq"
+  ],
+  "author": "Nivedita",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "groq-sdk": "^0.15.0",
+    "isomorphic-git": "^1.42.2"
+  }
+}
