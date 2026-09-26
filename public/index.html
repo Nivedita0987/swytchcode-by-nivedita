@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SentinelOps AI — Autonomous Real-World Operations Incident Commander</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <span class="pulse-dot"></span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">
+          SentinelOps <span class="badge-tag">AI Agent</span>
+        </div>
+        <div class="brand-sub">Build with Swytchcode :: Track 5 — AI Real World Agent</div>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <div class="integrations-pill">
+        <span class="pill-label">Swytchcode APIs:</span>
+        <span class="api-tag"><span class="dot live"></span>OpenWeather</span>
+        <span class="api-tag"><span class="dot live"></span>Notion</span>
+        <span class="api-tag"><span class="dot live"></span>Slack</span>
+        <span class="api-tag"><span class="dot live"></span>Resend</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="engine-badge" id="modelStatusBadge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        <span id="activeModelLabel">Groq LLaMA 3.3 Engine</span>
+      </div>
+      <button class="btn-icon" id="settingsBtn" title="API Credentials & Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-main">
+    <!-- Prompt & Trigger Command Center -->
+    <section class="prompt-section">
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <div class="prompt-title">
+            <span class="agent-indicator"></span>
+            <strong>Autonomous Operations Command Prompt</strong>
+            <span class="prompt-hint">Natural language task &rarr; multi-step Swytchcode reasoning &rarr; cross-platform action</span>
+          </div>
+          <div class="scenario-chips">
+            <span class="chip-label">Quick Jury Demos:</span>
+            <button class="chip" data-prompt="Monitor Gurgaon hub for monsoon cloudburst and road waterlogging. If critical, generate an emergency dispatch protocol in Notion, alert the on-call team on Slack with incident metrics, and email safety advisories to field drivers via Resend.">
+              🌧️ Gurgaon Monsoon Flash Flood
+            </button>
+            <button class="chip" data-prompt="Assess Delhi NCR for extreme heatwave hazards today. Calculate outdoor worker risk, publish an occupational heat protocol in Notion, post a critical incident card to Slack, and dispatch workforce hydration guidelines via Resend.">
+              🔥 Delhi 42°C Heatwave Emergency
+            </button>
+            <button class="chip" data-prompt="Evaluate sudden squall and downpour across Bengaluru tech corridor. Create a traffic and power contingency checklist in Notion, broadcast an urgent alert to Slack #ops, and email employee transit notices via Resend.">
+              ⛈️ Bengaluru Squall & Commute Risk
+            </button>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-wrapper">
+            <textarea id="promptInput" rows="2" placeholder="Instruct the agent (e.g. 'Assess Gurgaon weather risk today, prepare mitigation in Notion, notify Slack ops, and send team advisory')..."></textarea>
+          </div>
+          <button id="runAgentBtn" class="btn-primary">
+            <span class="btn-text">Dispatch Agent</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two-Column Workbench -->
+    <div class="workbench-grid">
+      <!-- Left Column: Agent Reasoning & Execution Trace -->
+      <section class="column-left">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Live Agent Execution & Reasoning Trace
+          </div>
+          <div class="panel-actions">
+            <span id="stepCounter" class="counter-badge">Ready</span>
+            <button id="clearTraceBtn" class="btn-text-sm">Clear</button>
+          </div>
+        </div>
+
+        <div class="trace-container" id="traceContainer">
+          <div class="empty-state">
+            <div class="empty-icon">🤖</div>
+            <h3>Autonomous Agent Ready</h3>
+            <p>Select a quick demo scenario above or enter a custom prompt. You will observe the agent reason, select Swytchcode tools, and chain actions live.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Swytchcode Multi-Platform Artifacts Center -->
+      <section class="column-right">
+        <div class="tabs-header">
+          <button class="tab-btn active" data-tab="tab-weather">
+            <span class="tab-icon">⛅</span>
+            <span>OpenWeather Telemetry</span>
+            <span class="tab-status-dot" id="dotWeather"></span>
+          </button>
+          <button class="tab-btn" data-tab="tab-notion">
+            <span class="tab-icon">📝</span>
+            <span>Notion Incident Page</span>
+            <span class="tab-status-dot" id="dotNotion"></span>
+          </button>
+          <button class="tab-btn" data-tab="tab-slack">
+            <span class="tab-icon">💬</span>
+            <span>Slack Ops Dispatch</span>
+            <span class="tab-status-dot" id="dotSlack"></span>
+          </button>
+          <button class="tab-btn" data-tab="tab-resend">
+            <span class="tab-icon">✉️</span>
+            <span>Resend Advisory</span>
+            <span class="tab-status-dot" id="dotResend"></span>
+          </button>
+          <button class="tab-btn" data-tab="tab-raw">
+            <span class="tab-icon">{ }</span>
+            <span>API Telemetry Inspector</span>
+          </button>
+        </div>
+
+        <div class="tab-content-area">
+          <!-- Tab 1: OpenWeather Card -->
+          <div class="tab-panel active" id="tab-weather">
+            <div id="weatherView" class="artifact-card">
+              <div class="placeholder-msg">Awaiting agent to invoke Swytchcode OpenWeather API...</div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Notion Document Preview -->
+          <div class="tab-panel" id="tab-notion">
+            <div id="notionView" class="artifact-card">
+              <div class="placeholder-msg">Awaiting agent to generate Notion incident protocol...</div>
+            </div>
+          </div>
+
+          <!-- Tab 3: Slack Block Kit Preview -->
+          <div class="tab-panel" id="tab-slack">
+            <div id="slackView" class="artifact-card">
+              <div class="placeholder-msg">Awaiting agent to dispatch Slack notification...</div>
+            </div>
+          </div>
+
+          <!-- Tab 4: Resend Email Preview -->
+          <div class="tab-panel" id="tab-resend">
+            <div id="resendView" class="artifact-card">
+              <div class="placeholder-msg">Awaiting agent to send safety email advisory via Resend...</div>
+            </div>
+          </div>
+
+          <!-- Tab 5: Raw JSON / Audit Trace -->
+          <div class="tab-panel" id="tab-raw">
+            <div class="raw-inspector-container">
+              <div class="inspector-controls">
+                <span class="inspector-label">Chained Swytchcode Execution Payload Trace</span>
+                <button id="copyJsonBtn" class="btn-text-sm">Copy JSON</button>
+              </div>
+              <pre id="rawJsonOutput" class="code-block"><code>// Complete execution telemetry will stream here</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Settings & Credentials Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Configuration & API Credentials</h3>
+        <button class="modal-close" id="closeSettingsModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          SentinelOps works out-of-the-box with live simulated data for instant jury demos. Add your real keys below for live external dispatch:
+        </p>
+
+        <div class="form-group">
+          <label for="inputGroqKey">Groq API Key (Free high-speed LLaMA 3.3)</label>
+          <input type="password" id="inputGroqKey" placeholder="gsk_...">
+          <small>Leave empty to use built-in autonomous reasoning state machine.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="inputSwytchcodeKey">Swytchcode API Key</label>
+          <input type="password" id="inputSwytchcodeKey" placeholder="swytch_live_...">
+          <small>Provided by Build with Swytchcode organizers.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="inputSwytchcodeUrl">Swytchcode Base URL</label>
+          <input type="text" id="inputSwytchcodeUrl" value="https://api.swytchcode.com/v1">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancelSettingsBtn">Close</button>
+        <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
