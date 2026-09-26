@@ -94,6 +94,7 @@ class SwytchcodeClient {
             timestamp: new Date().toISOString()
           };
         }
+        console.warn(`[OpenWeather Direct] HTTP ${resp.status}: ${resp.status === 401 ? 'key not activated yet (new keys take 10 min - 2 hours) or invalid' : 'request rejected'}`);
       } catch (e) {
         console.warn(`[OpenWeather Direct] Call failed: ${e.message}`);
       }
